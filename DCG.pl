@@ -1,52 +1,58 @@
 %-----Reglas-----
-S --> NP,VP.
-NP --> Det,Noun.
-NP --> Det,Noun,RelCl.
-NP --> Noun.
-VP --> Verb.
-VP --> Verb,NP.
-VP --> BeVerb,Adj.
-RelCl --> Rel,VP.
-RelCl --> Rel,NP,Verb.
+s(s(NP, VP)) --> np(NP, Num), vp(VP, Num).
+
+np(np(DET, N), Num) --> det(DET, Num), noun(N, Num).
+np(np(DET, ADJ, N), Num) --> det(DET, Num), adj(ADJ) ,noun(N, Num).
+np(np(DET, N, RC), Num) --> det(DET, Num), noun(N, Num), relCl(RC).
+np(np(ADJ, N), Num) --> adj(ADJ), noun(N, Num).
+np(np(ADJ, N, V), Num) --> adj(ADJ), noun(N, Num), vp(V, Num).
+
+vp(vp(V), Num) --> verb(V, Num).
+vp(vp(V, NP), Num) --> verb(V, Num), np(NP, _).
+vp(vp(V, ADJ), Num) --> beVerb(V, Num), adj(ADJ).
+
+relCl(rc(R, V)) --> rel(R), vp(V, _).
 
 
 
 %-----Terminales-----
-Det(plural) --> [all].
-Det(_) --> [some].
+det(det(all), plural) --> [all].
+det(det(some), _) --> [some].
+
+noun(n(boy), singular) --> [boy].
+noun(n(watermelon), singular) --> [watermelon].
+noun(n(flavor), singular) --> [flavor].
+noun(n(apple), singular) --> [apple].
+noun(n(person), singular) --> [person].
+noun(n(government), singular) --> [government].
     
-Noun(singular) --> [boy].
-Noun(plural) --> [boys].
-Noun(singular) --> [watermelon].
-Noun(plural) --> [watermelons].
-Noun(singular) --> [flavor].
-Noun(plural) --> [flavors].
-Noun(singular) --> [apple].
-Noun(plural) --> [apples].
-Noun(singular) --> [person].
-Noun(plural) --> [people].
-Noun(singular) --> [government].
-Noun(plural) --> [governments].
+noun(n(boys), plural) --> [boys].
+noun(n(watermelons), plural) --> [watermelons].
+noun(n(flavors), plural) --> [flavors].
+noun(n(apples), plural) --> [apples].
+noun(n(people), plural) --> [people].
+noun(n(governments), plural) --> [governments].
+
+verb(v(run), plural) --> [run].
+verb(v(like), plural) --> [like].
+verb(v(contain), plural) --> [contain].
+verb(v(eat), plural) --> [eat].
+verb(v(conscript), plural) --> [conscript].
     
-Verb(singular) --> [run].
-Verb(plural) --> [runs].
-Verb(singular) --> [like].
-Verb(plural) --> [likes].
-Verb(singular) --> [contain].
-Verb(plural) --> [contains].
-Verb(singular) --> [eat].
-Verb(plural) --> [eats].
-Verb(singular) --> [conscript].
-Verb(plural) --> [conscripts].
+verb(v(runs), singular) --> [runs].
+verb(v(likes), singular) --> [likes].
+verb(v(contains), singular) --> [contains].
+verb(v(eats), singular) --> [eats].
+verb(v(conscripts), singular) --> [conscripts].
     
-BeVerb(singular) --> [is].
-BeVerb(plural) --> [are].
+beVerb(v(is), singular) --> [is].
+beVerb(v(are), plural) --> [are].
     
-Adj --> [divine].
-Adj --> [pacifist].
-Adj --> [evil].
+adj(adj(divine)) --> [divine].
+adj(adj(pacifist)) --> [pacifist].
+adj(adj(evil)) --> [evil].
     
-Rel --> [that].
+rel(r(that)) --> [that].
 
 
 
