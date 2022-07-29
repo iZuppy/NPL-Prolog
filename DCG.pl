@@ -1,78 +1,108 @@
-%-----Reglas-----
-s(s(NP, VP)) --> np(NP, Num), vp(VP, Num).
-
-np(np(DET, N), Num) --> det(DET, Num), noun(N, Num).
-np(np(DET, ADJ, N), Num) --> det(DET, Num), adj(ADJ) ,noun(N, Num).
-np(np(DET, N, RC), Num) --> det(DET, Num), noun(N, Num), relCl(RC).
-np(np(ADJ, N), Num) --> adj(ADJ), noun(N, Num).
-np(np(ADJ, N, V), Num) --> adj(ADJ), noun(N, Num), vp(V, Num).
-
-vp(vp(V), Num) --> verb(V, Num).
-vp(vp(V, NP), Num) --> verb(V, Num), np(NP, _).
-vp(vp(V, ADJ), Num) --> beVerb(V, Num), adj(ADJ).
-
-relCl(rc(R, V)) --> rel(R), vp(V, _).
+%----------Operadores---------
+:- op(500,xfy,&).
+:- op(600,xfy,->).
 
 
 
-%-----Terminales-----
-det(det(all), plural) --> [all].
-det(det(some), _) --> [some].
-
-noun(n(boy), singular) --> [boy].
-noun(n(watermelon), singular) --> [watermelon].
-noun(n(flavor), singular) --> [flavor].
-noun(n(apple), singular) --> [apple].
-noun(n(person), singular) --> [person].
-noun(n(government), singular) --> [government].
-    
-noun(n(boys), plural) --> [boys].
-noun(n(watermelons), plural) --> [watermelons].
-noun(n(flavors), plural) --> [flavors].
-noun(n(apples), plural) --> [apples].
-noun(n(people), plural) --> [people].
-noun(n(governments), plural) --> [governments].
-
-verb(v(run), plural) --> [run].
-verb(v(like), plural) --> [like].
-verb(v(contain), plural) --> [contain].
-verb(v(eat), plural) --> [eat].
-verb(v(conscript), plural) --> [conscript].
-    
-verb(v(runs), singular) --> [runs].
-verb(v(likes), singular) --> [likes].
-verb(v(contains), singular) --> [contains].
-verb(v(eats), singular) --> [eats].
-verb(v(conscripts), singular) --> [conscripts].
-    
-beVerb(v(is), singular) --> [is].
-beVerb(v(are), plural) --> [are].
-    
-adj(adj(divine)) --> [divine].
-adj(adj(pacifist)) --> [pacifist].
-adj(adj(evil)) --> [evil].
-    
-rel(r(that)) --> [that].
+%-----------Inicio------------
+translate(Out):-
+    read(X),
+    name(X,L),
+    tokenize(L,Arr),
+    sentence(Out, Arr, []).
 
 
 
-%-----Tokenizer-----
-go(Out):-
-    read(X), 
-    name(X,L), 
-    tokenize(L,Out). 
+%-----------Reglas-------------
+sentence(P) --> 
+    noun_phrase(Num, X, P1, P), 
+    verb_phrase(Num, X, P1).
 
-tokenize([],[]):-!. 
+noun_phrase(Num, X, P1, P) --> 
+    determiner(Num, X, P2, P1, P), 
+    noun(Num, X, P3), 
+    rel_clause(Num, X, P3, P2).
+
+noun_phrase(Num, X, P1, P) --> 
+    determiner(Num, X, P2, P3, P1, P), 
+    adj(X, P3),
+    noun(Num, X, P4), 
+    rel_clause(Num, X, P4, P2).
+
+verb_phrase(Num, X, P) --> 
+    trans_verb(Num, X, Y, P1), 
+    noun_phrase(_, Y, P1, P).
+
+verb_phrase(Num, X, P) --> 
+    intrans_verb(Num, X, P).
+
+verb_phrase(Num, X, P) --> 
+    be_verb(Num),
+    adj(X, P).
+
+rel_clause(Num, X, P1, (P1&P2)) --> 
+    [that], 
+    verb_phrase(Num, X, P2).
+
+rel_clause(_, _, P, P) --> [].
+
+
+
+%---------Terminales------------
+determiner(plural, X, P1, P2, all(X, (P1 -> P2))) --> [all] ; ['All'].
+determiner(_, X, P1, P2, exists(X, (P1 & P2))) --> [some] ; ['Some'].
+determiner(_, X, P1, P2, P3, exists(X, (P1 & P2 & P3))) --> [some] ; ['Some'].
+determiner(_, X, P1, P2, P3, exists(X, (P1 & P2 & P3))) --> [].
+
+noun(singular, X, boy(X)) --> [boy].
+noun(singular, X, watermelon(X)) --> [watermelon].
+noun(singular, X, flavor(X)) --> [flavor].
+noun(singular, X, apple(X)) --> [apple].
+noun(singular, X, person(X)) --> [person].
+noun(singular, X, government(X)) --> [government].
+
+noun(plural, X, boy(X)) --> [boys].
+noun(plural, X, watermelon(X)) --> [watermelons].
+noun(plural, X, flavor(X)) --> [flavors].
+noun(plural, X, apple(X)) --> [apples].
+noun(plural, X, people(X)) --> [people].
+noun(plural, X, government(X)) --> [governments].
+
+trans_verb(singular, X, Y, like(X, Y)) --> [likes].
+trans_verb(singular, X, Y, contain(X, Y)) --> [contains].
+trans_verb(singular, X, Y, eat(X, Y)) --> [eats].
+trans_verb(singular, X, Y, conscript(X, Y)) --> [conscripts].
+
+trans_verb(plural, X, Y, like(X, Y)) --> [like].
+trans_verb(plural, X, Y, contain(X, Y)) --> [contain].
+trans_verb(plural, X, Y, eat(X, Y)) --> [eat].
+trans_verb(plural, X, Y, conscript(X, Y)) --> [conscript].
+
+intrans_verb(singular, X, runs(X)) --> [runs].
+intrans_verb(plural, X, run(X)) --> [run].
+
+be_verb(singular) --> [is].
+be_verb(plural) --> [are].
+
+adj(X, divine(X)) --> [divine].
+adj(X, pacifist(X)) --> [pacifist].
+adj(X, evil(X)) --> [evil].
+adj(_, _) --> [].
+
+
+
+%---------Tokenizer---------
+tokenize([],[]):-!.
 
 tokenize(L,[Word|Out]):-
     L\==[],
     tokenize(L,Rest,WordChs),
     name(Word,WordChs),
-    tokenize(Rest,Out). 
+    tokenize(Rest,Out).
 
-tokenize([],[],[]):- !. 
-tokenize([46|_],[],[]):- !. 
-tokenize([32|T],T,[]):- !. 
+tokenize([],[],[]):- !.
+tokenize([46|_],[],[]):- !.
+tokenize([32|T],T,[]):- !.
 
-tokenize([H|T],Rest,[H|List]):- 
+tokenize([H|T],Rest,[H|List]):-
     tokenize(T,Rest,List).
