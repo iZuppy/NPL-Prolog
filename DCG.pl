@@ -49,9 +49,15 @@ rel_clause(_, _, P, P) --> [].
 
 
 %---------Terminales------------
-determiner(plural, X, P1, P2, all(X, (P1 -> P2))) --> [all] ; ['All'].
-determiner(_, X, P1, P2, exists(X, (P1 & P2))) --> [some] ; ['Some'].
-determiner(_, X, P1, P2, P3, exists(X, (P1 & P2 & P3))) --> [some] ; ['Some'].
+determiner(plural, X, P1, P2, all(X, (P1 -> P2))) --> [all].
+determiner(plural, X, P1, P2, all(X, (P1 -> P2))) --> ['All'].
+
+determiner(_, X, P1, P2, exists(X, (P1 & P2))) --> [some].
+determiner(_, X, P1, P2, exists(X, (P1 & P2))) --> ['Some'].
+
+determiner(_, X, P1, P2, P3, exists(X, (P1 & P2 & P3))) --> [some].
+determiner(_, X, P1, P2, P3, exists(X, (P1 & P2 & P3))) --> ['Some'].
+
 determiner(_, X, P1, P2, P3, exists(X, (P1 & P2 & P3))) --> [].
 
 noun(singular, X, boy(X)) --> [boy].
@@ -106,3 +112,12 @@ tokenize([32|T],T,[]):- !.
 
 tokenize([H|T],Rest,[H|List]):-
     tokenize(T,Rest,List).
+
+
+
+%---------Casos de prueba---------
+% 'All boys run'.
+% 'All boys like all watermelons that contain some divine flavor'.
+% 'Some boy eats some apple'.
+% 'Some government conscripts some pacifist people'.
+% 'All governments that conscript pacifist people are evil'.
